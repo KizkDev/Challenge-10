@@ -1,5 +1,6 @@
 const express = require('express');
 const inquirer = require('inquirer');
+const fs = require('fs');
 
 function managerPrompt() {
 
@@ -23,6 +24,11 @@ function managerPrompt() {
     type: 'prompt',
     message: 'What´s email address?',
     name: 'email_address',
+    validate: (managerMail) => {
+        valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(managerMail);
+        if (!valid) {console.error(' ',"\x1b[41m",' <<<< Please enter a valid email >>>> ',"\x1b[0m")};
+        return valid;
+    }
 },
 
 {
@@ -40,27 +46,36 @@ function managerPrompt() {
 
 function additionalOptions() {
 inquirer.prompt ([
-{
-    type: 'prompt',
-    message: "add an Engineer",
-    name: 'add_Engineer'
-},
+// {
+//     type: 'prompt',
+//     message: "add an Engineer",
+//     name: 'add_Engineer'
+// },
+
+// {
+//     type: 'prompt',
+//     message: "add an intern",
+//     name: 'add_Intern'
+// },
 
 {
-    type: 'prompt',
-    message: "add an intern",
-    name: 'add_Intern'
+    type: 'list',
+    name: 'memberRole',
+    message: '\nPlease indicate if you want to add an Engineer or an Intern?\n',
+    choices: ['Engineer', 'Intern'],
 },
 
 ]).then ((answers) =>{
-    if (answers.name === 'add_Engineer') {
+    if (answers.choices === 'Engineer') {
         engineerQuestions();
-    } else if (answers.name === 'add_Intern') {
+    } else if (answers.choices === 'Intern') {
         internQuestions();
     }
 })
 
 }
+
+
 
 function engineerQuestions() {
 inquirer.prompt([
@@ -81,9 +96,8 @@ inquirer.prompt([
         name: 'github_username'
     },
 
-]).then((answers) => {
-    history.back();
-})
+])
+
 }
 
 function internQuestions() {
@@ -104,18 +118,42 @@ function internQuestions() {
         {
             type: 'prompt',
             message: "Whats the intern´s email?",
-            name: 'intern_email'
-        },
+            name: 'intern_email',
+            validate: (internMail) => {
+                valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(internMail);
+                if (!valid) {console.error(' ',"\x1b[41m",' <<<< Please enter a valid email >>>> ',"\x1b[0m")};
+                return valid;
+        }
+    },
         {
             type: 'prompt',
             message: "Whats the intern´s school?",
             name: 'intern_school'
         },
 
+        {
+            type: 'list',
+            name: 'addAnother',
+            message: 'Do you want to add another team member?',
+            choices: ['Yes', 'No'],
+        }
 
-        ]).then((answers) => {
-
-            history.back();
-        })
-    
+        ])
     }
+
+
+    const addTeamMember = async (answerCollector = []) => {
+        const { addAnother, ...currentAnswers } = additionalOptions()
+        answerCollector = [...answerCollector, currentAnswers]
+        return addAnother == 'Yes' ? addTeamMember(answerCollector) : answerCollector;        
+    }
+
+     const getManagerQuestions = async () => {
+        const { ...managerAnswers } =  managerPrompt()
+        return managerAnswers
+    }
+    
+
+
+console.log(addTeamMember);
+
