@@ -1,6 +1,9 @@
 const express = require('express');
 const inquirer = require('inquirer');
 const fs = require('fs');
+let Manager = require('./lib/Manager');
+let generateManager = require('./src/generatemanager');
+let htmlString = "";
 
 function managerPrompt() {
 
@@ -40,23 +43,23 @@ function managerPrompt() {
 
 
     ]).then((answers) => {
+
+        let managerOutput = new Manager (answers.office_number, answers.manager_name, answers.email_address, answers.Employee_id);
+console.log(managerOutput);
+let managerHtml = generateManager(managerOutput);
+
+console.log(managerHtml);
+
+managerHtml += managerHtml
+
         additionalOptions();
+
     })
 }
 
 function additionalOptions() {
 inquirer.prompt ([
-// {
-//     type: 'prompt',
-//     message: "add an Engineer",
-//     name: 'add_Engineer'
-// },
 
-// {
-//     type: 'prompt',
-//     message: "add an intern",
-//     name: 'add_Intern'
-// },
 
 {
     type: 'list',
@@ -66,9 +69,10 @@ inquirer.prompt ([
 },
 
 ]).then ((answers) =>{
-    if (answers.choices === 'Engineer') {
+    
+    if (answers.memberRole === 'Engineer') {
         engineerQuestions();
-    } else if (answers.choices === 'Intern') {
+    } else if (answers.memberRole === 'Intern') {
         internQuestions();
     }
 })
@@ -96,7 +100,11 @@ inquirer.prompt([
         name: 'github_username'
     },
 
-])
+]).then ((answers) =>{
+
+continue_or_stop();
+}
+)
 
 }
 
@@ -131,29 +139,54 @@ function internQuestions() {
             name: 'intern_school'
         },
 
-        {
-            type: 'list',
-            name: 'addAnother',
-            message: 'Do you want to add another team member?',
-            choices: ['Yes', 'No'],
-        }
+        // {
+        //     type: 'list',
+        //     name: 'addAnother',
+        //     message: 'Do you want to add another team member?',
+        //     choices: ['Yes', 'No'],
+        // }
 
         ])
     }
 
+    function continue_or_stop(){
+        inquirer.prompt([
+{
+type: 'list',
+name: 'addAnother',
+message: 'Do you want to add another team member?',
+choices: ['Yes', 'No']
+}
+        ]).then((answers) =>{
 
-    const addTeamMember = async (answerCollector = []) => {
-        const { addAnother, ...currentAnswers } = additionalOptions()
-        answerCollector = [...answerCollector, currentAnswers]
-        return addAnother == 'Yes' ? addTeamMember(answerCollector) : answerCollector;        
+            if (answers.addAnother === 'Yes') {
+                additionalOptions();
+            } 
+            else if (answers.addAnother === 'No') {
+console.log('HTML generated');
+            }
+        
+        }
+        )
+
     }
 
-     const getManagerQuestions = async () => {
-        const { ...managerAnswers } =  managerPrompt()
-        return managerAnswers
-    }
+
+
+
+    // const addTeamMember = async (answerCollector = []) => {
+    //     const { addAnother, ...currentAnswers } = additionalOptions()
+    //     answerCollector = [...answerCollector, currentAnswers]
+    //     return addAnother == 'Yes' ? addTeamMember(answerCollector) : answerCollector;        
+    // }
+
+    //  const getManagerQuestions = async () => {
+    //     const { ...managerAnswers } =  managerPrompt()
+    //     return managerAnswers
+    // }
     
 
 
-console.log(addTeamMember);
+// console.log(addTeamMember);
 
+managerPrompt();
