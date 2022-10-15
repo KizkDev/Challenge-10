@@ -2,7 +2,10 @@ const express = require('express');
 const inquirer = require('inquirer');
 const fs = require('fs');
 let Manager = require('./lib/Manager');
-let generateManager = require('./src/generatemanager');
+let Engineer = require('./lib/Engineer');
+let Employee = require('./lib/Employee');
+let generateManagerHtml = require('./src/generatemanager');
+let generateEngineer = require('./src/generateengineer');
 let htmlString = "";
 
 function managerPrompt() {
@@ -46,7 +49,7 @@ function managerPrompt() {
 
         let managerOutput = new Manager (answers.office_number, answers.manager_name, answers.email_address, answers.Employee_id);
 console.log(managerOutput);
-let managerHtml = generateManager(managerOutput);
+let managerHtml = generateManagerHtml(managerOutput);
 
 console.log(managerHtml);
 
@@ -101,6 +104,15 @@ inquirer.prompt([
     },
 
 ]).then ((answers) =>{
+    let engineerOutput = new Engineer (answers.engineer_name, answers.engineer_id, answers.github_username);
+    console.log(engineerOutput);
+
+    let engineerHtml = generateEngineer(engineerOutput);
+    
+    console.log(engineerHtml);
+     
+    managerHtml += managerHtml
+    
 
 continue_or_stop();
 }
