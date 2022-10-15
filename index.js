@@ -7,7 +7,7 @@ let Employee = require('./lib/Employee');
 let generateManager = require('./src/generatemanager');
 let generateEngineer = require('./src/generateengineer');
 let htmlString = "";
-
+//Husky
 function managerPrompt() {
 
     inquirer.prompt([
